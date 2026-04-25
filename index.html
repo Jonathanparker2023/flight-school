@@ -93,6 +93,32 @@
       </div>
     </div>
 
+    <div class="view-tabs">
+      <button class="vtab active" data-view="formation">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M12 5v14M3 12h18"/></svg>
+        Formation
+      </button>
+      <button class="vtab" data-view="grid">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Grid
+      </button>
+    </div>
+
+    <div id="formationView" class="formation-wrap">
+      <div class="formation-controls">
+        <div class="chip-group" id="unitFilter">
+          <button class="chip active" data-unit="offense">Offense</button>
+          <button class="chip" data-unit="defense">Defense</button>
+          <button class="chip" data-unit="special">Special Teams</button>
+        </div>
+        <div class="formation-name" id="formationName">11 Personnel · Shotgun</div>
+      </div>
+      <div class="field-stage">
+        <div class="field" id="field"></div>
+      </div>
+    </div>
+
+    <div id="gridView" hidden>
     <div class="filters">
       <div class="search-box">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -126,6 +152,7 @@
 
     <div id="rosterGrid" class="roster-grid"></div>
     <div id="rosterEmpty" class="empty-state" hidden>No players match those filters.</div>
+    </div>
   </div>
 </section>
 

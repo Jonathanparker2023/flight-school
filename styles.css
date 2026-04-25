@@ -627,3 +627,356 @@ input, select { font: inherit; color: inherit; }
   .hero { padding-top: var(--space-10); }
   .footer-meta { text-align: left; }
 }
+
+/* ============== VIEW TABS ============== */
+.view-tabs {
+  display: inline-flex; gap: 4px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); margin-bottom: var(--space-6);
+}
+.vtab {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 8px;
+  font-size: var(--text-sm); font-weight: 600; color: var(--text-muted);
+}
+.vtab:hover { color: var(--text); }
+.vtab.active { background: var(--primary); color: #fff; }
+
+/* ============== FORMATION ============== */
+.formation-wrap {}
+.formation-controls {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: var(--space-4); margin-bottom: var(--space-5); flex-wrap: wrap;
+}
+.formation-name {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.field-stage {
+  position: relative;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+/* ============== REALISTIC FIELD ============== */
+.field {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+  /* Mowed grass stripes (horizontal, alternating shades) + base green */
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.04) 0,
+      rgba(255,255,255,0.04) 6%,
+      rgba(0,0,0,0.06) 6%,
+      rgba(0,0,0,0.06) 12%),
+    linear-gradient(180deg, #1a6b40 0%, #155838 50%, #114A30 100%);
+  overflow: hidden;
+  box-shadow:
+    inset 0 0 80px rgba(0,0,0,0.55),
+    inset 0 0 0 4px rgba(255,255,255,0.12);
+}
+
+/* Field-of-play container — yard lines live here, between the endzones */
+.field-play {
+  position: absolute;
+  inset: 0 8%; /* sidelines align with endzone edges */
+  pointer-events: none;
+}
+
+/* Yard lines every 10 yards (10 stripes between goal lines = 100yds; lines at 0,10,20,...,90,100). Solid white. */
+.field-play::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    /* major yard lines every 10 yards (vertical lines) */
+    repeating-linear-gradient(90deg,
+      transparent 0,
+      transparent calc(10% - 1.5px),
+      rgba(255,255,255,0.78) calc(10% - 1.5px),
+      rgba(255,255,255,0.78) calc(10% + 1.5px),
+      transparent calc(10% + 1.5px),
+      transparent 20%);
+}
+
+/* Hash marks: two horizontal rows of short white ticks every 5 yards (NFL hashes are at ~35% and ~65% of the field width vertically). Drawn as two thin background bands. */
+.field-play .hashes-top,
+.field-play .hashes-bot {
+  position: absolute; left: 0; right: 0; height: 6px;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0,
+      transparent calc(5% - 1px),
+      rgba(255,255,255,0.7) calc(5% - 1px),
+      rgba(255,255,255,0.7) calc(5% + 1px),
+      transparent calc(5% + 1px),
+      transparent 10%);
+}
+.field-play .hashes-top { top: 36%; }
+.field-play .hashes-bot { top: 64%; }
+
+/* Sidelines (top and bottom of field-of-play) */
+.field-play .sideline {
+  position: absolute; left: 0; right: 0; height: 3px;
+  background: rgba(255,255,255,0.85);
+}
+.field-play .sideline.top { top: 0; }
+.field-play .sideline.bottom { bottom: 0; }
+
+/* Midfield 50 yard line accent (thicker) */
+.field-play .midfield {
+  position: absolute; top: 0; bottom: 0;
+  left: 50%; width: 3px;
+  background: rgba(255,255,255,0.95);
+  transform: translateX(-50%);
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* Yard numbers - rendered via flex container */
+.field-numbers {
+  position: absolute; left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  padding: 0 8%; /* match endzone offset */
+  font-family: var(--font-display);
+  font-size: clamp(10px, 1.6vw, 22px);
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+.field-numbers.top { top: 14%; }
+.field-numbers.bottom { bottom: 14%; transform: scaleX(1) rotate(180deg); }
+.field-numbers span {
+  width: 0; text-align: center; transform: translateX(-50%);
+  position: relative;
+}
+.field-numbers span:first-child { transform: translateX(0); }
+.field-numbers span:last-child { transform: translateX(-100%); }
+
+/* Yard numbers placed by absolute positioning instead — cleaner approach */
+.yard-num {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: clamp(9px, 1.5vw, 20px);
+  color: rgba(255,255,255,0.78);
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  pointer-events: none;
+  transform: translateX(-50%);
+  user-select: none;
+}
+.yard-num.top { top: 12%; }
+.yard-num.bottom { bottom: 12%; transform: translateX(-50%) rotate(180deg); }
+
+/* Endzones — Eagles colored with team name */
+.endzone {
+  position: absolute; top: 0; bottom: 0; width: 8%;
+  background:
+    linear-gradient(180deg,
+      rgba(255,255,255,0.06) 0,
+      transparent 6%, transparent 94%,
+      rgba(255,255,255,0.06) 100%),
+    linear-gradient(135deg, #003b42 0%, #004C54 50%, #002C32 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: clamp(11px, 1.6vw, 22px);
+  letter-spacing: 0.32em;
+  color: rgba(255,255,255,0.92);
+  writing-mode: vertical-rl;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  border-left: 3px solid rgba(255,255,255,0.85);
+  border-right: 3px solid rgba(255,255,255,0.85);
+  z-index: 1;
+}
+.endzone.left { left: 0; transform: scaleY(-1); border-left: none; }
+.endzone.right { right: 0; border-right: none; }
+
+/* Midfield Eagles logo */
+.field-logo {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(60px, 11vw, 150px);
+  height: clamp(60px, 11vw, 150px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  animation: logoFade 800ms ease-out backwards 200ms;
+}
+@keyframes logoFade {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  100% { opacity: 0.45; transform: translate(-50%, -50%) scale(1); }
+}
+.field-logo svg {
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* Player chip on field */
+.fp {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer;
+  z-index: 2;
+  animation: fpDrop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.fp:nth-child(2) { animation-delay: 30ms; }
+.fp:nth-child(3) { animation-delay: 60ms; }
+.fp:nth-child(4) { animation-delay: 90ms; }
+.fp:nth-child(5) { animation-delay: 120ms; }
+.fp:nth-child(6) { animation-delay: 150ms; }
+.fp:nth-child(7) { animation-delay: 180ms; }
+.fp:nth-child(8) { animation-delay: 210ms; }
+.fp:nth-child(9) { animation-delay: 240ms; }
+.fp:nth-child(10) { animation-delay: 270ms; }
+.fp:nth-child(11) { animation-delay: 300ms; }
+@keyframes fpDrop {
+  0% { opacity: 0; transform: translate(-50%, -120%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.fp-avatar {
+  position: relative;
+  width: clamp(40px, 5.2vw, 64px); height: clamp(40px, 5.2vw, 64px);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--eagles-silver-light), var(--eagles-silver));
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 0 3px rgba(0,76,84,0.6);
+  overflow: hidden;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms;
+}
+.fp-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center 18%;
+  background: var(--eagles-silver-light);
+}
+.fp-avatar .initials {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-family: var(--font-display); color: var(--eagles-green-deep);
+  font-size: clamp(14px, 1.6vw, 22px); letter-spacing: 0.04em;
+}
+.fp:hover .fp-avatar {
+  transform: scale(1.18);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 0 3px var(--eagles-green-bright), 0 0 24px rgba(42,141,142,0.5);
+  z-index: 5;
+}
+.fp-jersey {
+  position: absolute; bottom: -4px; right: -4px;
+  background: var(--eagles-green-deep); color: #fff;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  padding: 2px 5px; border-radius: 8px;
+  border: 2px solid #fff;
+  min-width: 22px; text-align: center;
+}
+.fp-label {
+  font-size: clamp(9px, 0.85vw, 11px);
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  max-width: 110px; overflow: hidden; text-overflow: ellipsis;
+}
+.fp-pos {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  color: var(--eagles-silver-light);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  letter-spacing: 0.08em;
+}
+
+/* ============== AVATAR ON CARDS ============== */
+.pc-top { position: relative; }
+.pc-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(180deg, var(--eagles-silver-light), var(--eagles-silver));
+  border: 2px solid var(--eagles-green);
+  overflow: hidden; flex-shrink: 0;
+}
+.pc-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; }
+.pc-avatar .initials {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-family: var(--font-display); color: var(--eagles-green-deep);
+  font-size: 18px; letter-spacing: 0.04em;
+}
+
+/* ============== MODAL ANIMATIONS ============== */
+.modal-hero { display: flex; gap: var(--space-5); align-items: center; }
+.mh-headshot {
+  width: 130px; height: 130px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 3px solid rgba(255,255,255,0.4);
+  overflow: hidden; flex-shrink: 0;
+  position: relative;
+  animation: headshotPop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
+             headshotFloat 4s ease-in-out infinite 700ms;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.mh-headshot::after {
+  content: '';
+  position: absolute; inset: -3px;
+  border-radius: 50%;
+  border: 2px solid var(--eagles-silver);
+  opacity: 0.6;
+  animation: ringPulse 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes headshotPop {
+  0% { opacity: 0; transform: scale(0.4) rotate(-8deg); }
+  60% { opacity: 1; transform: scale(1.08) rotate(2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+@keyframes headshotFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ringPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.08); opacity: 0.0; }
+}
+.mh-headshot img { width: 100%; height: 100%; object-fit: cover; object-position: center 18%; background: linear-gradient(180deg, var(--eagles-silver-light), var(--eagles-silver)); }
+.mh-headshot .initials { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-family: var(--font-display); color: #fff; font-size: 48px; letter-spacing: 0.04em; }
+.mh-text { flex: 1; min-width: 0; }
+.mh-jersey { position: static !important; font-size: 80px !important; opacity: 0.18; line-height: 1; pointer-events: none; right: var(--space-6) !important; top: 50% !important; transform: translateY(-50%); position: absolute !important; }
+@media (max-width: 600px) {
+  .modal-hero { flex-direction: column; text-align: center; }
+  .mh-headshot { width: 100px; height: 100px; }
+}
+
+/* OVR counter animation */
+.mob-overall { animation: ovrCount 1000ms ease-out backwards 200ms; }
+@keyframes ovrCount {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Attribute pill bar animation */
+.attr-pill {
+  position: relative; overflow: hidden;
+}
+.attr-pill::before {
+  content: ''; position: absolute; left: 0; bottom: 0;
+  height: 2px; width: var(--bar-width, 0%);
+  background: linear-gradient(90deg, var(--primary), var(--eagles-silver));
+  animation: barFill 800ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: var(--bar-delay, 0ms);
+}
+@keyframes barFill {
+  from { width: 0%; }
+  to { width: var(--bar-width, 0%); }
+}
+.attr-pill .attr-val {
+  animation: numPop 400ms ease-out backwards;
+  animation-delay: var(--bar-delay, 0ms);
+  display: inline-block;
+}
+@keyframes numPop {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

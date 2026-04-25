@@ -66,6 +66,10 @@
     if (v >= 70) return 'mid';
     return 'low';
   }
+  function initials(name) {
+    if (!name) return '';
+    return name.replace(/\(.*?\)/g, '').trim().split(/\s+/).slice(0, 2).map((s) => s[0]).join('').toUpperCase();
+  }
 
   // -------- Madden index --------
   const maddenIndex = {};
@@ -76,14 +80,233 @@
     return maddenIndex[name.toLowerCase()] || null;
   }
 
+  // -------- Player lookup helpers --------
+  function findStarter(position, fallbackPositions) {
+    let p = ROSTER.find((x) => x.position === position && x.depth === 'Starter');
+    if (p) return p;
+    if (fallbackPositions) {
+      for (const fp of fallbackPositions) {
+        p = ROSTER.find((x) => x.position === fp && x.depth === 'Starter');
+        if (p) return p;
+      }
+    }
+    // any depth at this position with highest madden
+    const list = ROSTER.filter((x) => x.position === position).sort((a, b) =>
+      ((getMadden(b.name) || {}).overall || 0) - ((getMadden(a.name) || {}).overall || 0)
+    );
+    return list[0] || null;
+  }
+
+  function findStartersByPosition(position, count) {
+    const starters = ROSTER.filter((x) => x.position === position && x.depth === 'Starter');
+    if (starters.length >= count) return starters.slice(0, count);
+    // fall back to any depth, ranked by Madden OVR
+    const all = ROSTER.filter((x) => x.position === position).sort(
+      (a, b) => ((getMadden(b.name) || {}).overall || 0) - ((getMadden(a.name) || {}).overall || 0)
+    );
+    return all.slice(0, count);
+  }
+
   // -------- Hero stats --------
   function fillHeroStats() {
     document.getElementById('statRoster').textContent = ROSTER.length;
     const totalCap = ROSTER.reduce((sum, p) => sum + (p.cap_hit_2026 || 0), 0);
     document.getElementById('statCap').textContent = '$' + (totalCap / 1e6).toFixed(0) + 'M';
-    // Record + standing populated by ESPN fetch
     document.getElementById('rosterAsOf').textContent = (DATA.roster && DATA.roster.as_of_date) || '—';
     document.getElementById('maddenVersion').textContent = (DATA.madden && DATA.madden.game_version) || 'Madden 26';
+  }
+
+  // -------- FORMATION VIEW --------
+
+  // Layouts: top:0 = top of field (offense attacks up), top:100 = bottom
+  // Offense lines up at the bottom, attacking upward
+  const FORMATIONS = {
+    offense: {
+      label: '11 Personnel · Shotgun',
+      slots: [
+        // Receivers up top (deep downfield)
+        { pos: 'WR', label: 'WR-X',  top: 30, left: 8,  index: 0 },
+        { pos: 'WR', label: 'WR-Z',  top: 30, left: 92, index: 1 },
+        // QB in shotgun
+        { pos: 'QB', label: 'QB',    top: 60, left: 50 },
+        // RB beside QB
+        { pos: 'RB', label: 'RB',    top: 60, left: 36 },
+        // Tight end — lined up just outside the RT
+        { pos: 'TE', label: 'TE',    top: 80, left: 78 },
+        // O-Line (5 across, just behind LOS)
+        { pos: 'LT', label: 'LT',    top: 75, left: 28 },
+        { pos: 'LG', label: 'LG',    top: 75, left: 38 },
+        { pos: 'C',  label: 'C',     top: 75, left: 48 },
+        { pos: 'RG', label: 'RG',    top: 75, left: 58 },
+        { pos: 'RT', label: 'RT',    top: 75, left: 68 },
+      ],
+    },
+    defense: {
+      label: 'Vic Fangio · 4-2-5 Nickel',
+      slots: [
+        // Defensive line (4 across, deep — opponent has the ball at top)
+        { pos: 'DE', label: 'LE',    top: 32, left: 30, index: 0 },
+        { pos: 'DT', label: 'DT',    top: 32, left: 42, index: 0 },
+        { pos: 'DT', label: 'NT',    top: 32, left: 54, index: 1 },
+        { pos: 'DE', label: 'RE',    top: 32, left: 66, index: 1 },
+        // Linebackers
+        { pos: 'LB', label: 'MLB',   top: 46, left: 42, index: 0 },
+        { pos: 'LB', label: 'WLB',   top: 46, left: 58, index: 1 },
+        // Cornerbacks (outside)
+        { pos: 'CB', label: 'CB',    top: 38, left: 8,  index: 0 },
+        { pos: 'CB', label: 'CB',    top: 38, left: 92, index: 1 },
+        // Nickel (slot CB)
+        { pos: 'CB', label: 'NCB',   top: 50, left: 22, index: 2 },
+        // Safeties (deepest)
+        { pos: 'S',  label: 'FS',    top: 70, left: 38, index: 0 },
+        { pos: 'S',  label: 'SS',    top: 70, left: 62, index: 1 },
+      ],
+    },
+    special: {
+      label: 'Field Goal Unit',
+      slots: [
+        { pos: 'K',  label: 'K',     top: 78, left: 38 },
+        { pos: 'P',  label: 'P/H',   top: 70, left: 46 },
+        { pos: 'LS', label: 'LS',    top: 60, left: 50 },
+        { pos: 'LT', label: 'LT',    top: 60, left: 32 },
+        { pos: 'LG', label: 'LG',    top: 60, left: 40 },
+        { pos: 'C',  label: 'C',     top: 60, left: 50, _skip: true },
+        { pos: 'RG', label: 'RG',    top: 60, left: 60 },
+        { pos: 'RT', label: 'RT',    top: 60, left: 68 },
+        { pos: 'TE', label: 'WING-L',top: 58, left: 22 },
+        { pos: 'TE', label: 'WING-R',top: 58, left: 78, index: 1 },
+        { pos: 'WR', label: 'GUNNER',top: 58, left: 6,  index: 2 },
+      ],
+    },
+  };
+
+  // Eagles logo SVG — stylized eagle wing inspired by the team's primary mark
+  const EAGLES_LOGO_SVG = `
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="Philadelphia Eagles">
+      <defs>
+        <linearGradient id="wingGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C8CFD2"/>
+          <stop offset="60%" stop-color="#8A9094"/>
+          <stop offset="100%" stop-color="#5A6063"/>
+        </linearGradient>
+      </defs>
+      <!-- Left wing -->
+      <path d="M100 60
+               C 80 50, 50 48, 24 56
+               C 38 60, 50 66, 60 76
+               C 38 76, 22 84, 10 100
+               C 28 96, 48 96, 64 102
+               C 48 108, 36 120, 30 138
+               C 50 124, 72 116, 92 116
+               L 100 116 Z"
+            fill="url(#wingGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+      <!-- Right wing (mirror) -->
+      <path d="M100 60
+               C 120 50, 150 48, 176 56
+               C 162 60, 150 66, 140 76
+               C 162 76, 178 84, 190 100
+               C 172 96, 152 96, 136 102
+               C 152 108, 164 120, 170 138
+               C 150 124, 128 116, 108 116
+               L 100 116 Z"
+            fill="url(#wingGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+      <!-- Center body / accent -->
+      <path d="M100 56 L106 116 L100 130 L94 116 Z"
+            fill="#004C54" stroke="#fff" stroke-width="1.5"/>
+    </svg>`;
+
+  function buildFieldChrome() {
+    // Endzones, yard lines, midfield, numbers, logo. Players appended after.
+    const numbersTop = [];
+    const numbersBot = [];
+    // Yard line numbers: 10, 20, 30, 40, 50, 40, 30, 20, 10
+    // Positioned at left% relative to whole field (endzones occupy 0-8% and 92-100%)
+    // Field-of-play spans 8%-92% = 84% of width, divided into 10 segments of 8.4% each
+    // Yard lines at 8% + (n * 8.4%) for n=0..10 (goal line, 10, 20, ..., 50, ..., goal line)
+    const labels = [10, 20, 30, 40, 50, 40, 30, 20, 10];
+    for (let i = 0; i < labels.length; i++) {
+      const leftPct = 8 + (i + 1) * 8.4; // skip goal line (i+1 = 1..9 = 10,20,...,90 yards)
+      numbersTop.push(`<div class="yard-num top" style="left:${leftPct}%">${labels[i]}</div>`);
+      numbersBot.push(`<div class="yard-num bottom" style="left:${leftPct}%">${labels[i]}</div>`);
+    }
+    return `
+      <div class="endzone left">EAGLES</div>
+      <div class="endzone right">EAGLES</div>
+      <div class="field-play">
+        <div class="sideline top"></div>
+        <div class="sideline bottom"></div>
+        <div class="midfield"></div>
+        <div class="hashes-top"></div>
+        <div class="hashes-bot"></div>
+      </div>
+      ${numbersTop.join('')}
+      ${numbersBot.join('')}
+      <div class="field-logo">${EAGLES_LOGO_SVG}</div>
+    `;
+  }
+
+  function renderFormation(unit) {
+    const field = document.getElementById('field');
+    const formation = FORMATIONS[unit] || FORMATIONS.offense;
+    document.getElementById('formationName').textContent = formation.label;
+
+    const used = new Set();
+    const playerHTML = formation.slots
+      .filter((slot) => !slot._skip)
+      .map((slot) => {
+        // Find player for slot — pick by index of starters at that position
+        let player = null;
+        const idx = slot.index || 0;
+        const candidates = ROSTER.filter((p) => p.position === slot.pos && p.depth === 'Starter' && !used.has(p.name));
+        if (candidates[idx]) player = candidates[idx];
+        else if (candidates[0]) player = candidates[0];
+        else {
+          // Fallback to any depth
+          const fallback = ROSTER.filter((p) => p.position === slot.pos && !used.has(p.name))
+            .sort((a, b) => ((getMadden(b.name) || {}).overall || 0) - ((getMadden(a.name) || {}).overall || 0));
+          player = fallback[idx] || fallback[0] || null;
+        }
+        if (!player) return ''; // no player available
+        used.add(player.name);
+
+        const m = getMadden(player.name);
+        const ovr = m ? m.overall : null;
+        const tier = ovrTier(ovr);
+        const headshot = player.headshot;
+        const avatarInner = headshot
+          ? `<img src="${escape(headshot)}" alt="${escape(player.name)}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=&quot;initials&quot;>${escape(initials(player.name))}</span>'+this.parentElement.innerHTML;" />`
+          : `<span class="initials">${escape(initials(player.name))}</span>`;
+        const lastName = player.name.split(/\s+/).slice(-1)[0].replace(/[().]/g, '');
+        // Map player position from field-of-play percent to absolute field percent.
+        // Field-of-play is 8%..92% horizontally; vertical is 0..100% of field.
+        const absLeft = 8 + (slot.left / 100) * 84;
+        return `
+          <div class="fp ovr-${tier}" data-name="${escape(player.name)}"
+               style="top:${slot.top}%; left:${absLeft}%;"
+               role="button" tabindex="0"
+               aria-label="${escape(player.name)}, ${escape(slot.label)}">
+            <div class="fp-avatar">
+              ${avatarInner}
+              <div class="fp-jersey">${player.jersey_number || '–'}</div>
+            </div>
+            <div class="fp-pos">${escape(slot.label)}</div>
+            <div class="fp-label">${escape(lastName)}</div>
+          </div>
+        `;
+      })
+      .join('');
+
+    field.innerHTML = buildFieldChrome() + playerHTML;
+
+    field.querySelectorAll('.fp').forEach((el) => {
+      el.addEventListener('click', () => openModal(el.dataset.name));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal(el.dataset.name);
+        }
+      });
+    });
   }
 
   // -------- ROSTER GRID --------
@@ -92,6 +315,8 @@
     depth: 'all',
     search: '',
     sort: 'overall',
+    view: 'formation',
+    unit: 'offense',
   };
 
   function filterAndSortRoster() {
@@ -137,11 +362,15 @@
     const ovr = m ? m.overall : null;
     const tier = ovrTier(ovr);
     const ovrLabel = ovr ? ovr + ' OVR' : 'NR';
+    const avatarInner = p.headshot
+      ? `<img src="${escape(p.headshot)}" alt="" loading="lazy" />`
+      : `<span class="initials">${escape(initials(p.name))}</span>`;
     return `
       <article class="player-card" data-name="${escape(p.name)}" tabindex="0" role="button" aria-label="${escape(p.name)} details">
         <div class="pc-top">
+          <div class="pc-avatar">${avatarInner}</div>
           <div class="pc-jersey">#${p.jersey_number || '–'}</div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto;">
             <span class="pc-pos">${escape(p.position)}</span>
             <span class="depth-badge depth-${escape(p.depth)}">${escape(p.depth)}</span>
           </div>
@@ -205,8 +434,8 @@
         .slice(0, 12);
       attrsHTML = entries
         .map(
-          ([k, v]) => `
-        <div class="attr-pill">
+          ([k, v], i) => `
+        <div class="attr-pill" style="--bar-width:${v}%; --bar-delay:${300 + i * 60}ms;">
           <span class="attr-name">${escape(formatAttrName(k))}</span>
           <span class="attr-val ${attrTier(v)}">${v}</span>
         </div>
@@ -218,24 +447,31 @@
     const strengths = (p.strengths || []).map((s) => `<li>${escape(s)}</li>`).join('');
     const weaknesses = (p.weaknesses || []).map((s) => `<li>${escape(s)}</li>`).join('');
 
+    const headshotInner = p.headshot
+      ? `<img src="${escape(p.headshot)}" alt="${escape(p.name)}" />`
+      : `<span class="initials">${escape(initials(p.name))}</span>`;
+
     return `
       <div class="modal-hero">
-        <div class="mh-jersey">#${p.jersey_number || '–'}</div>
-        <span class="mh-pos">${escape(p.position)} · ${escape(p.depth)}</span>
-        <div class="mh-name">${escape(p.name)}</div>
-        <div class="mh-meta">
-          <span>${p.age} years old</span>
-          <span>${escape(p.height || '')} · ${p.weight || ''} lb</span>
-          <span>${escape(p.college || '')}</span>
-          <span>Year ${p.years_pro || '?'} pro</span>
+        <div class="mh-headshot">${headshotInner}</div>
+        <div class="mh-text">
+          <span class="mh-pos">${escape(p.position)} · ${escape(p.depth)}</span>
+          <div class="mh-name">${escape(p.name)}</div>
+          <div class="mh-meta">
+            <span>${p.age} years old</span>
+            <span>${escape(p.height || '')} · ${p.weight || ''} lb</span>
+            <span>${escape(p.college || '')}</span>
+            <span>Year ${p.years_pro || '?'} pro</span>
+          </div>
         </div>
+        <div class="mh-jersey">#${p.jersey_number || '–'}</div>
       </div>
       <div class="modal-body-content">
         ${
           m
             ? `
           <div class="modal-ovr-block">
-            <div class="mob-overall ${tier}">${ovr}</div>
+            <div class="mob-overall ${tier}" data-ovr="${ovr}">${ovr}</div>
             <div class="mob-meta">
               <div class="mob-label">Madden 26 Overall</div>
               <div style="font-size:13px;color:var(--text-muted);">${escape(m.archetype || '')}</div>
@@ -461,9 +697,6 @@
     if (!isNaN(n)) return n === 1 ? '1st year with Eagles' : n + ' years with Eagles';
     return String(y);
   }
-  function initials(name) {
-    return name.split(/\s+/).slice(0, 2).map((s) => s[0]).join('').toUpperCase();
-  }
 
   // -------- LIVE: NEWS --------
   const ESPN_NEWS = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/news?team=21&limit=12';
@@ -565,7 +798,6 @@
       list.innerHTML = '<div class="empty-state">No scheduled games.</div>';
       return;
     }
-    // Show last 2 completed + next 4 upcoming + any in-progress
     const now = Date.now();
     const sorted = events.slice().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     const past = sorted.filter((e) => new Date(e.date).getTime() < now).slice(-2);
@@ -611,8 +843,41 @@
       .join('');
   }
 
+  // -------- VIEW + UNIT TOGGLES --------
+  function setView(view) {
+    state.view = view;
+    document.querySelectorAll('.vtab').forEach((b) => {
+      b.classList.toggle('active', b.dataset.view === view);
+    });
+    const formationView = document.getElementById('formationView');
+    const gridView = document.getElementById('gridView');
+    if (view === 'formation') {
+      formationView.hidden = false;
+      gridView.hidden = true;
+      renderFormation(state.unit);
+    } else {
+      formationView.hidden = true;
+      gridView.hidden = false;
+      renderRoster();
+    }
+  }
+
+  function setUnit(unit) {
+    state.unit = unit;
+    document.querySelectorAll('#unitFilter .chip').forEach((b) => {
+      b.classList.toggle('active', b.dataset.unit === unit);
+    });
+    renderFormation(unit);
+  }
+
   // -------- WIRE UP --------
   function wireFilters() {
+    document.querySelectorAll('.vtab').forEach((b) =>
+      b.addEventListener('click', () => setView(b.dataset.view))
+    );
+    document.querySelectorAll('#unitFilter .chip').forEach((b) =>
+      b.addEventListener('click', () => setUnit(b.dataset.unit))
+    );
     document.querySelectorAll('#groupFilter .chip').forEach((b) =>
       b.addEventListener('click', () => {
         document.querySelectorAll('#groupFilter .chip').forEach((x) => x.classList.remove('active'));
@@ -652,6 +917,7 @@
   // -------- BOOT --------
   function boot() {
     fillHeroStats();
+    renderFormation(state.unit);
     renderRoster();
     renderDepthChart();
     renderDraft('2026');
@@ -660,7 +926,6 @@
     loadNews();
     loadTeam();
     loadSchedule();
-    // Auto-refresh live data every 5 minutes
     setInterval(loadNews, 5 * 60 * 1000);
     setInterval(loadTeam, 5 * 60 * 1000);
     setInterval(loadSchedule, 5 * 60 * 1000);
