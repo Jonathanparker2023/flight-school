@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Eagles Hub · Live Roster, Madden Ratings & News</title>
-<meta name="description" content="Interactive Philadelphia Eagles roster — Madden 26 ratings, salaries, depth chart, coaching staff, draft picks, plus live news and scores from ESPN." />
+<title>Flight School · Philly Football Roster, Ratings & News</title>
+<meta name="description" content="Flight School — interactive Philly football roster, Madden 26 ratings, salaries, depth chart, coaching staff, draft picks, plus live news and scores. Independent fan project." />
+<meta name="robots" content="index,follow" />
+<meta property="og:title" content="Flight School · Philly Football Roster & Ratings" />
+<meta property="og:description" content="Every player. Every contract. Every Madden rating. Live news and scores — all in one place." />
+<meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23004C54'/%3E%3Cpath d='M6 21 L16 9 L26 21 L21 21 L16 15 L11 21 Z' fill='%23A5ACAF'/%3E%3C/svg%3E" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230C2117'/%3E%3Cpath d='M12 40 L34 16 L52 16 L36 32 L44 32 L22 52 Z' fill='%23A5ACAF'/%3E%3C/svg%3E" />
 </head>
 <body>
 
@@ -17,18 +21,18 @@
 <header class="topbar">
   <div class="container topbar-inner">
     <a class="brand" href="#">
-      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
         <defs>
           <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" stop-color="#A5ACAF"/>
             <stop offset="1" stop-color="#565A5C"/>
           </linearGradient>
         </defs>
-        <circle cx="24" cy="24" r="22" fill="#004C54" stroke="#A5ACAF" stroke-width="1.5"/>
-        <path d="M10 30 C 14 18, 22 14, 32 14 L 38 14 L 30 22 L 36 22 L 26 30 L 30 30 L 22 36 L 26 36 L 16 38 Z" fill="url(#wing)"/>
+        <circle cx="32" cy="32" r="30" fill="#0C2117" stroke="#A5ACAF" stroke-width="1.5"/>
+        <path d="M12 40 L34 16 L52 16 L36 32 L44 32 L22 52 Z" fill="url(#wing)"/>
       </svg>
       <div class="brand-text">
-        <div class="brand-title">EAGLES HUB</div>
+        <div class="brand-title">FLIGHT SCHOOL</div>
         <div class="brand-sub">Roster · Madden 26 · Live</div>
       </div>
     </a>
@@ -57,11 +61,11 @@
   <div class="container hero-inner">
     <div class="hero-content">
       <div class="hero-eyebrow">
-        <span class="champion-badge">★ SUPER BOWL LIX CHAMPIONS</span>
+        <span class="champion-badge">★ REIGNING NFL CHAMPIONS</span>
         <span class="season-tag">2026 SEASON</span>
       </div>
-      <h1 class="hero-title">Philadelphia <span class="accent">Eagles</span></h1>
-      <p class="hero-sub">Every player. Every contract. Every Madden rating. Live news and scores from across the league — all in one place.</p>
+      <h1 class="hero-title">Flight <span class="accent">School</span></h1>
+      <p class="hero-sub">Your independent home for Philly football. Every player, every contract, every Madden rating — plus live news and scores from across the league.</p>
       <div class="hero-stats" id="heroStats">
         <div class="stat"><div class="stat-num" id="statRoster">—</div><div class="stat-label">Players</div></div>
         <div class="stat"><div class="stat-num" id="statRecord">—</div><div class="stat-label">Record</div></div>
@@ -247,8 +251,9 @@
 <footer class="footer">
   <div class="container footer-inner">
     <div>
-      <div class="footer-brand">EAGLES HUB</div>
-      <div class="footer-tag">Built for the Birds. Data from ESPN, Spotrac, OverTheCap, EA Madden Ratings & PhiladelphiaEagles.com.</div>
+      <div class="footer-brand">FLIGHT SCHOOL</div>
+      <div class="footer-tag">Built by fans, for fans. Data sourced from ESPN, Spotrac, OverTheCap, and public depth charts.</div>
+      <div class="footer-disclaimer">Flight School is an independent fan project and is not affiliated with, endorsed by, or sponsored by the Philadelphia Eagles, the National Football League, or any of their affiliates. All team names, logos, and trademarks are the property of their respective owners. Player names and statistics are factual data.</div>
     </div>
     <div class="footer-meta">
       <div>Roster as of <span id="rosterAsOf">—</span></div>

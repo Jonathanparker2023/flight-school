@@ -1,5 +1,5 @@
 /* =========================================================
-   EAGLES HUB — Midnight Green / Silver / Black
+   FLIGHT SCHOOL — Midnight / Silver / Black
    ========================================================= */
 
 :root {
@@ -603,6 +603,7 @@ input, select { font: inherit; color: inherit; }
 }
 .footer-brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.08em; }
 .footer-tag { color: var(--text-muted); font-size: 13px; max-width: 60ch; margin-top: var(--space-2); }
+.footer-disclaimer { color: var(--text-faint); font-size: 11px; line-height: 1.5; max-width: 70ch; margin-top: var(--space-3); opacity: 0.75; }
 .footer-meta { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-faint); text-align: right; }
 
 /* ============== SKELETONS ============== */
@@ -764,7 +765,7 @@ input, select { font: inherit; color: inherit; }
   transform: translate(-50%, -50%) rotate(90deg);
 }
 
-/* Endzones — horizontal bars top + bottom. "EAGLES" reads normally. */
+/* Endzones — horizontal bars top + bottom. "FLIGHT SCHOOL" reads normally. */
 .endzone {
   position: absolute; left: 0; right: 0; height: 8%;
   background:
@@ -772,11 +773,11 @@ input, select { font: inherit; color: inherit; }
       rgba(255,255,255,0.06) 0,
       transparent 6%, transparent 94%,
       rgba(255,255,255,0.06) 100%),
-    linear-gradient(135deg, #003b42 0%, #004C54 50%, #002C32 100%);
+    linear-gradient(135deg, #0c2117 0%, #14342a 50%, #08160f 100%);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(16px, 3.2vw, 32px);
-  letter-spacing: 0.4em;
+  font-size: clamp(11px, 2.4vw, 24px);
+  letter-spacing: 0.32em;
   color: rgba(255,255,255,0.95);
   text-shadow: 0 2px 6px rgba(0,0,0,0.6);
   z-index: 1;
@@ -979,7 +980,7 @@ input, select { font: inherit; color: inherit; }
   .yard-num.left[style*="top:50"], .yard-num.right[style*="top:50"] { display: block; }
 
   /* Smaller endzone text */
-  .endzone { font-size: clamp(13px, 5vw, 22px); letter-spacing: 0.3em; }
+  .endzone { font-size: clamp(10px, 3.6vw, 16px); letter-spacing: 0.22em; }
 
   /* Shrink midfield logo so it doesn't crowd players */
   .field-logo { width: clamp(60px, 28vw, 110px); opacity: 0.55; }

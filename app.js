@@ -1,5 +1,5 @@
 /* =========================================================
-   EAGLES HUB — App Logic
+   FLIGHT SCHOOL — App Logic
    ========================================================= */
 (function () {
   'use strict';
@@ -197,8 +197,8 @@
     },
   };
 
-  // Real Philadelphia Eagles primary logo (saved locally as eagles-logo.svg)
-  const EAGLES_LOGO_SVG = `<img src="eagles-logo.svg" alt="Philadelphia Eagles" />`;
+  // Flight School wordmark/logo for the field center.
+  const EAGLES_LOGO_SVG = `<img src="flight-school-logo.svg" alt="Flight School" />`;
 
   function buildFieldChrome() {
     // VERTICAL field: endzones top + bottom, yard lines horizontal.
@@ -214,8 +214,8 @@
       yardNums.push(`<div class="yard-num right" style="top:${topPct}%">${labels[i]}</div>`);
     }
     return `
-      <div class="endzone top">EAGLES</div>
-      <div class="endzone bottom">EAGLES</div>
+      <div class="endzone top">FLIGHT SCHOOL</div>
+      <div class="endzone bottom">FLIGHT SCHOOL</div>
       <div class="field-play">
         <div class="sideline left"></div>
         <div class="sideline right"></div>
