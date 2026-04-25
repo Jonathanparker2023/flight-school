@@ -180,40 +180,8 @@
     },
   };
 
-  // Eagles logo SVG — stylized eagle wing inspired by the team's primary mark
-  const EAGLES_LOGO_SVG = `
-    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-label="Philadelphia Eagles">
-      <defs>
-        <linearGradient id="wingGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#C8CFD2"/>
-          <stop offset="60%" stop-color="#8A9094"/>
-          <stop offset="100%" stop-color="#5A6063"/>
-        </linearGradient>
-      </defs>
-      <!-- Left wing -->
-      <path d="M100 60
-               C 80 50, 50 48, 24 56
-               C 38 60, 50 66, 60 76
-               C 38 76, 22 84, 10 100
-               C 28 96, 48 96, 64 102
-               C 48 108, 36 120, 30 138
-               C 50 124, 72 116, 92 116
-               L 100 116 Z"
-            fill="url(#wingGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
-      <!-- Right wing (mirror) -->
-      <path d="M100 60
-               C 120 50, 150 48, 176 56
-               C 162 60, 150 66, 140 76
-               C 162 76, 178 84, 190 100
-               C 172 96, 152 96, 136 102
-               C 152 108, 164 120, 170 138
-               C 150 124, 128 116, 108 116
-               L 100 116 Z"
-            fill="url(#wingGrad)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
-      <!-- Center body / accent -->
-      <path d="M100 56 L106 116 L100 130 L94 116 Z"
-            fill="#004C54" stroke="#fff" stroke-width="1.5"/>
-    </svg>`;
+  // Real Philadelphia Eagles primary logo (saved locally as eagles-logo.svg)
+  const EAGLES_LOGO_SVG = `<img src="eagles-logo.svg" alt="Philadelphia Eagles" />`;
 
   function buildFieldChrome() {
     // Endzones, yard lines, midfield, numbers, logo. Players appended after.
