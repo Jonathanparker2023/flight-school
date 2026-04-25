@@ -126,11 +126,11 @@
     offense: {
       label: '11 Personnel · Trips Right',
       slots: [
-        // O-Line — 5 across at the line of scrimmage, evenly spaced
+        // O-Line — 5 across at the LOS. Alternate name labels above/below so they don't collide.
         { pos: 'LT', label: 'LT',    top: 66, left: 36 },
-        { pos: 'LG', label: 'LG',    top: 66, left: 43 },
+        { pos: 'LG', label: 'LG',    top: 66, left: 43, nameAbove: true },
         { pos: 'C',  label: 'C',     top: 66, left: 50 },
-        { pos: 'RG', label: 'RG',    top: 66, left: 57 },
+        { pos: 'RG', label: 'RG',    top: 66, left: 57, nameAbove: true },
         { pos: 'RT', label: 'RT',    top: 66, left: 64 },
         // X (split end) — way out wide LEFT at the numbers, on the LOS
         { pos: 'WR', label: 'X',     top: 66, left: 10, index: 0 },
@@ -149,22 +149,25 @@
     defense: {
       label: 'Vic Fangio · 4-2-5 Nickel',
       slots: [
-        // Defensive line (4 across, just over the LOS — directly opposite the OL)
-        { pos: 'DE', label: 'LE',    top: 38, left: 32, index: 0 },
-        { pos: 'DT', label: 'DT',    top: 38, left: 44, index: 0 },
-        { pos: 'DT', label: 'NT',    top: 38, left: 56, index: 1 },
-        { pos: 'DE', label: 'RE',    top: 38, left: 68, index: 1 },
-        // Linebackers (off-ball)
-        { pos: 'LB', label: 'MLB',   top: 28, left: 42, index: 0 },
-        { pos: 'LB', label: 'WLB',   top: 28, left: 58, index: 1 },
-        // Cornerbacks (outside, near LOS)
-        { pos: 'CB', label: 'CB',    top: 38, left: 12, index: 0 },
-        { pos: 'CB', label: 'CB',    top: 38, left: 88, index: 1 },
-        // Nickel (slot CB)
-        { pos: 'CB', label: 'NCB',   top: 32, left: 22, index: 2 },
-        // Safeties (deepest, in defense's half)
-        { pos: 'S',  label: 'FS',    top: 16, left: 40, index: 0 },
-        { pos: 'S',  label: 'SS',    top: 16, left: 60, index: 1 },
+        // Defensive line (4 across, deep at LOS — names render ABOVE chip so they
+        // don't cover the player's face).
+        { pos: 'DE', label: 'LE',    top: 50, left: 32, index: 0, nameAbove: true },
+        { pos: 'DT', label: 'DT',    top: 50, left: 44, index: 0, nameAbove: true },
+        { pos: 'DT', label: 'NT',    top: 50, left: 56, index: 1, nameAbove: true },
+        { pos: 'DE', label: 'RE',    top: 50, left: 68, index: 1, nameAbove: true },
+        // Linebackers (off-ball, sit between DL and safeties — plenty of room)
+        { pos: 'LB', label: 'MLB',   top: 30, left: 42, index: 0 },
+        { pos: 'LB', label: 'WLB',   top: 30, left: 58, index: 1 },
+        // Cornerbacks (way out wide on the numbers, even with the LOS — plenty of horizontal
+        // space so labels go below by default)
+        { pos: 'CB', label: 'CB',    top: 50, left: 10, index: 0 },
+        { pos: 'CB', label: 'CB',    top: 50, left: 90, index: 1 },
+        // Nickel (slot CB, inside the LWR — sits a touch off the line, label above to
+        // avoid colliding with NT/DT name labels)
+        { pos: 'CB', label: 'NCB',   top: 42, left: 20, index: 2, nameAbove: true },
+        // Safeties (deepest, spread wide horizontally)
+        { pos: 'S',  label: 'FS',    top: 14, left: 28, index: 0 },
+        { pos: 'S',  label: 'SS',    top: 14, left: 72, index: 1 },
       ],
     },
     special: {
@@ -258,18 +261,25 @@
           return lp[lp.length - 1].replace(/[().]/g, '') === lastName;
         });
         const displayName = sameLast.length > 1 ? `${firstInitial}. ${lastName}` : lastName;
-        // Vertical field: players use raw top/left percentages (sideline-to-sideline = 0%-100%).
-        return `
-          <div class="fp ovr-${tier}" data-name="${escape(player.name)}"
-               style="top:${slot.top}%; left:${slot.left}%;"
-               role="button" tabindex="0"
-               aria-label="${escape(player.name)}, ${escape(slot.label)}">
+        // If nameAbove is set, render the name label ABOVE the avatar instead of below.
+        // Used to stagger O-line labels so they don't overlap, and to keep D-line names
+        // off the players' faces.
+        const above = !!slot.nameAbove;
+        const avatarBlock = `
             <div class="fp-avatar">
               ${avatarInner}
               <div class="fp-jersey">${player.jersey_number || '–'}</div>
             </div>
-            <div class="fp-pos">${escape(slot.label)}</div>
-            <div class="fp-label">${escape(displayName)}</div>
+            <div class="fp-pos">${escape(slot.label)}</div>`;
+        const labelBlock = `<div class="fp-label">${escape(displayName)}</div>`;
+        const inner = above ? labelBlock + avatarBlock : avatarBlock + labelBlock;
+        // Vertical field: players use raw top/left percentages (sideline-to-sideline = 0%-100%).
+        return `
+          <div class="fp ovr-${tier}${above ? ' fp-name-above' : ''}" data-name="${escape(player.name)}"
+               style="top:${slot.top}%; left:${slot.left}%;"
+               role="button" tabindex="0"
+               aria-label="${escape(player.name)}, ${escape(slot.label)}">
+            ${inner}
           </div>
         `;
       })
