@@ -118,64 +118,71 @@
 
   // -------- FORMATION VIEW --------
 
-  // Layouts: top:0 = top of field (offense attacks up), top:100 = bottom
-  // Offense lines up at the bottom, attacking upward
+  // VERTICAL FIELD layout. top:0 = top endzone (defense's end), top:100 = bottom endzone.
+  // Offense lines up at the bottom (top:75-90), attacking upward.
+  // Defense aligns in the top half (top:25-50), defending against bottom-side offense.
+  // left% spans full sideline-to-sideline (0=left sideline, 100=right sideline).
   const FORMATIONS = {
     offense: {
-      label: '11 Personnel · Shotgun',
+      label: '11 Personnel · Trips Right',
       slots: [
-        // Receivers up top (deep downfield)
-        { pos: 'WR', label: 'WR-X',  top: 30, left: 8,  index: 0 },
-        { pos: 'WR', label: 'WR-Z',  top: 30, left: 92, index: 1 },
-        // QB in shotgun
-        { pos: 'QB', label: 'QB',    top: 60, left: 50 },
-        // RB beside QB
-        { pos: 'RB', label: 'RB',    top: 60, left: 36 },
-        // Tight end — lined up just outside the RT
-        { pos: 'TE', label: 'TE',    top: 80, left: 78 },
-        // O-Line (5 across, just behind LOS)
-        { pos: 'LT', label: 'LT',    top: 75, left: 28 },
-        { pos: 'LG', label: 'LG',    top: 75, left: 38 },
-        { pos: 'C',  label: 'C',     top: 75, left: 48 },
-        { pos: 'RG', label: 'RG',    top: 75, left: 58 },
-        { pos: 'RT', label: 'RT',    top: 75, left: 68 },
+        // O-Line — 5 across at the line of scrimmage, evenly spaced
+        { pos: 'LT', label: 'LT',    top: 66, left: 36 },
+        { pos: 'LG', label: 'LG',    top: 66, left: 43 },
+        { pos: 'C',  label: 'C',     top: 66, left: 50 },
+        { pos: 'RG', label: 'RG',    top: 66, left: 57 },
+        { pos: 'RT', label: 'RT',    top: 66, left: 64 },
+        // X (split end) — way out wide LEFT at the numbers, on the LOS
+        { pos: 'WR', label: 'X',     top: 66, left: 10, index: 0 },
+        // Y — TE flexed just outside RT, on the LOS
+        { pos: 'TE', label: 'Y',     top: 66, left: 73 },
+        // Z — slot receiver outside Y, off the line
+        { pos: 'WR', label: 'Z',     top: 72, left: 82, index: 1 },
+        // Trips wide — split out RIGHT at the numbers
+        { pos: 'WR', label: 'SLOT',  top: 66, left: 92, index: 2 },
+        // QB in shotgun — deep behind center
+        { pos: 'QB', label: 'Q',     top: 80, left: 53 },
+        // RB / Tailback offset to the QB's left, slightly deeper
+        { pos: 'RB', label: 'T',     top: 86, left: 42 },
       ],
     },
     defense: {
       label: 'Vic Fangio · 4-2-5 Nickel',
       slots: [
-        // Defensive line (4 across, deep — opponent has the ball at top)
-        { pos: 'DE', label: 'LE',    top: 32, left: 30, index: 0 },
-        { pos: 'DT', label: 'DT',    top: 32, left: 42, index: 0 },
-        { pos: 'DT', label: 'NT',    top: 32, left: 54, index: 1 },
-        { pos: 'DE', label: 'RE',    top: 32, left: 66, index: 1 },
-        // Linebackers
-        { pos: 'LB', label: 'MLB',   top: 46, left: 42, index: 0 },
-        { pos: 'LB', label: 'WLB',   top: 46, left: 58, index: 1 },
-        // Cornerbacks (outside)
-        { pos: 'CB', label: 'CB',    top: 38, left: 8,  index: 0 },
-        { pos: 'CB', label: 'CB',    top: 38, left: 92, index: 1 },
+        // Defensive line (4 across, just over the LOS — directly opposite the OL)
+        { pos: 'DE', label: 'LE',    top: 38, left: 32, index: 0 },
+        { pos: 'DT', label: 'DT',    top: 38, left: 44, index: 0 },
+        { pos: 'DT', label: 'NT',    top: 38, left: 56, index: 1 },
+        { pos: 'DE', label: 'RE',    top: 38, left: 68, index: 1 },
+        // Linebackers (off-ball)
+        { pos: 'LB', label: 'MLB',   top: 28, left: 42, index: 0 },
+        { pos: 'LB', label: 'WLB',   top: 28, left: 58, index: 1 },
+        // Cornerbacks (outside, near LOS)
+        { pos: 'CB', label: 'CB',    top: 38, left: 12, index: 0 },
+        { pos: 'CB', label: 'CB',    top: 38, left: 88, index: 1 },
         // Nickel (slot CB)
-        { pos: 'CB', label: 'NCB',   top: 50, left: 22, index: 2 },
-        // Safeties (deepest)
-        { pos: 'S',  label: 'FS',    top: 70, left: 38, index: 0 },
-        { pos: 'S',  label: 'SS',    top: 70, left: 62, index: 1 },
+        { pos: 'CB', label: 'NCB',   top: 32, left: 22, index: 2 },
+        // Safeties (deepest, in defense's half)
+        { pos: 'S',  label: 'FS',    top: 16, left: 40, index: 0 },
+        { pos: 'S',  label: 'SS',    top: 16, left: 60, index: 1 },
       ],
     },
     special: {
       label: 'Field Goal Unit',
       slots: [
-        { pos: 'K',  label: 'K',     top: 78, left: 38 },
-        { pos: 'P',  label: 'P/H',   top: 70, left: 46 },
-        { pos: 'LS', label: 'LS',    top: 60, left: 50 },
-        { pos: 'LT', label: 'LT',    top: 60, left: 32 },
-        { pos: 'LG', label: 'LG',    top: 60, left: 40 },
-        { pos: 'C',  label: 'C',     top: 60, left: 50, _skip: true },
-        { pos: 'RG', label: 'RG',    top: 60, left: 60 },
-        { pos: 'RT', label: 'RT',    top: 60, left: 68 },
-        { pos: 'TE', label: 'WING-L',top: 58, left: 22 },
-        { pos: 'TE', label: 'WING-R',top: 58, left: 78, index: 1 },
-        { pos: 'WR', label: 'GUNNER',top: 58, left: 6,  index: 2 },
+        // Holder + kicker behind the line, snapper at LOS
+        { pos: 'K',  label: 'K',     top: 92, left: 50 },
+        { pos: 'P',  label: 'P/H',   top: 84, left: 50 },
+        { pos: 'LS', label: 'LS',    top: 72, left: 50 },
+        // Protection (5-man interior + wings)
+        { pos: 'LT', label: 'LT',    top: 72, left: 38 },
+        { pos: 'LG', label: 'LG',    top: 72, left: 44 },
+        { pos: 'RG', label: 'RG',    top: 72, left: 56 },
+        { pos: 'RT', label: 'RT',    top: 72, left: 62 },
+        { pos: 'TE', label: 'WING-L',top: 72, left: 28, index: 0 },
+        { pos: 'TE', label: 'WING-R',top: 72, left: 72, index: 1 },
+        // Gunner out wide on the line
+        { pos: 'WR', label: 'GUNNER',top: 72, left: 12, index: 2 },
       ],
     },
   };
@@ -184,31 +191,29 @@
   const EAGLES_LOGO_SVG = `<img src="eagles-logo.svg" alt="Philadelphia Eagles" />`;
 
   function buildFieldChrome() {
-    // Endzones, yard lines, midfield, numbers, logo. Players appended after.
-    const numbersTop = [];
-    const numbersBot = [];
-    // Yard line numbers: 10, 20, 30, 40, 50, 40, 30, 20, 10
-    // Positioned at left% relative to whole field (endzones occupy 0-8% and 92-100%)
-    // Field-of-play spans 8%-92% = 84% of width, divided into 10 segments of 8.4% each
-    // Yard lines at 8% + (n * 8.4%) for n=0..10 (goal line, 10, 20, ..., 50, ..., goal line)
+    // VERTICAL field: endzones top + bottom, yard lines horizontal.
+    // Field-of-play spans 8% to 92% of total height (endzones occupy 0-8% top and 92-100% bottom).
+    // The 9 yard-line numbers (10,20,30,40,50,40,30,20,10) are spaced evenly at 10% increments
+    // within the field-of-play, which is 84% tall — so 9.33% increments starting at 8% + 9.33%.
     const labels = [10, 20, 30, 40, 50, 40, 30, 20, 10];
+    const yardNums = [];
     for (let i = 0; i < labels.length; i++) {
-      const leftPct = 8 + (i + 1) * 8.4; // skip goal line (i+1 = 1..9 = 10,20,...,90 yards)
-      numbersTop.push(`<div class="yard-num top" style="left:${leftPct}%">${labels[i]}</div>`);
-      numbersBot.push(`<div class="yard-num bottom" style="left:${leftPct}%">${labels[i]}</div>`);
+      // Position numbers at the yard lines: 10% in from each goal line, then every 10% across
+      const topPct = 8 + (i + 1) * 8.4; // 16.4, 24.8, ..., 83.6
+      yardNums.push(`<div class="yard-num left" style="top:${topPct}%">${labels[i]}</div>`);
+      yardNums.push(`<div class="yard-num right" style="top:${topPct}%">${labels[i]}</div>`);
     }
     return `
-      <div class="endzone left">EAGLES</div>
-      <div class="endzone right">EAGLES</div>
+      <div class="endzone top">EAGLES</div>
+      <div class="endzone bottom">EAGLES</div>
       <div class="field-play">
-        <div class="sideline top"></div>
-        <div class="sideline bottom"></div>
+        <div class="sideline left"></div>
+        <div class="sideline right"></div>
         <div class="midfield"></div>
-        <div class="hashes-top"></div>
-        <div class="hashes-bot"></div>
+        <div class="hashes-left"></div>
+        <div class="hashes-right"></div>
       </div>
-      ${numbersTop.join('')}
-      ${numbersBot.join('')}
+      ${yardNums.join('')}
       <div class="field-logo">${EAGLES_LOGO_SVG}</div>
     `;
   }
@@ -244,13 +249,19 @@
         const avatarInner = headshot
           ? `<img src="${escape(headshot)}" alt="${escape(player.name)}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=&quot;initials&quot;>${escape(initials(player.name))}</span>'+this.parentElement.innerHTML;" />`
           : `<span class="initials">${escape(initials(player.name))}</span>`;
-        const lastName = player.name.split(/\s+/).slice(-1)[0].replace(/[().]/g, '');
-        // Map player position from field-of-play percent to absolute field percent.
-        // Field-of-play is 8%..92% horizontally; vertical is 0..100% of field.
-        const absLeft = 8 + (slot.left / 100) * 84;
+        // Show last name; if any other player on the field shares it, prepend first initial (e.g. "A. Brown")
+        const parts = player.name.replace(/\(.*?\)/g, '').trim().split(/\s+/);
+        const lastName = parts[parts.length - 1].replace(/[().]/g, '');
+        const firstInitial = parts[0] ? parts[0][0] : '';
+        const sameLast = ROSTER.filter((p) => {
+          const lp = p.name.replace(/\(.*?\)/g, '').trim().split(/\s+/);
+          return lp[lp.length - 1].replace(/[().]/g, '') === lastName;
+        });
+        const displayName = sameLast.length > 1 ? `${firstInitial}. ${lastName}` : lastName;
+        // Vertical field: players use raw top/left percentages (sideline-to-sideline = 0%-100%).
         return `
           <div class="fp ovr-${tier}" data-name="${escape(player.name)}"
-               style="top:${slot.top}%; left:${absLeft}%;"
+               style="top:${slot.top}%; left:${slot.left}%;"
                role="button" tabindex="0"
                aria-label="${escape(player.name)}, ${escape(slot.label)}">
             <div class="fp-avatar">
@@ -258,7 +269,7 @@
               <div class="fp-jersey">${player.jersey_number || '–'}</div>
             </div>
             <div class="fp-pos">${escape(slot.label)}</div>
-            <div class="fp-label">${escape(lastName)}</div>
+            <div class="fp-label">${escape(displayName)}</div>
           </div>
         `;
       })

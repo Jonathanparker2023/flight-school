@@ -660,40 +660,45 @@ input, select { font: inherit; color: inherit; }
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
 }
-/* ============== REALISTIC FIELD ============== */
+/* ============== REALISTIC FIELD (VERTICAL / PORTRAIT) ============== */
+/* Field is now portrait — endzones top + bottom, yard lines horizontal.
+   Offense lines up at the bottom ("home" side), attacking up the field. */
 .field {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  /* Portrait aspect: 4:5 keeps the field tall enough to read but not so tall it overflows the screen */
+  aspect-ratio: 4 / 5;
+  max-width: 600px;
+  margin: 0 auto;
   border-radius: var(--radius-md);
-  /* Mowed grass stripes (horizontal, alternating shades) + base green */
+  /* Mowed grass stripes run "horizontally" across the field (perpendicular to play direction).
+     In portrait the play direction is vertical, so stripes are horizontal bands. */
   background:
     repeating-linear-gradient(0deg,
       rgba(255,255,255,0.04) 0,
-      rgba(255,255,255,0.04) 6%,
-      rgba(0,0,0,0.06) 6%,
-      rgba(0,0,0,0.06) 12%),
-    linear-gradient(180deg, #1a6b40 0%, #155838 50%, #114A30 100%);
+      rgba(255,255,255,0.04) 5%,
+      rgba(0,0,0,0.06) 5%,
+      rgba(0,0,0,0.06) 10%),
+    linear-gradient(90deg, #1a6b40 0%, #155838 50%, #114A30 100%);
   overflow: hidden;
   box-shadow:
     inset 0 0 80px rgba(0,0,0,0.55),
     inset 0 0 0 4px rgba(255,255,255,0.12);
 }
 
-/* Field-of-play container — yard lines live here, between the endzones */
+/* Field-of-play container — sits between the two horizontal endzones */
 .field-play {
   position: absolute;
-  inset: 0 8%; /* sidelines align with endzone edges */
+  inset: 8% 0; /* endzones occupy 0-8% top and 92-100% bottom */
   pointer-events: none;
 }
 
-/* Yard lines every 10 yards (10 stripes between goal lines = 100yds; lines at 0,10,20,...,90,100). Solid white. */
+/* Yard lines every 10 yards — horizontal lines now */
 .field-play::before {
   content: '';
   position: absolute; inset: 0;
   background:
-    /* major yard lines every 10 yards (vertical lines) */
-    repeating-linear-gradient(90deg,
+    repeating-linear-gradient(0deg,
       transparent 0,
       transparent calc(10% - 1.5px),
       rgba(255,255,255,0.78) calc(10% - 1.5px),
@@ -702,12 +707,12 @@ input, select { font: inherit; color: inherit; }
       transparent 20%);
 }
 
-/* Hash marks: two horizontal rows of short white ticks every 5 yards (NFL hashes are at ~35% and ~65% of the field width vertically). Drawn as two thin background bands. */
-.field-play .hashes-top,
-.field-play .hashes-bot {
-  position: absolute; left: 0; right: 0; height: 6px;
+/* Hash marks: two vertical columns of ticks every 5 yards. */
+.field-play .hashes-left,
+.field-play .hashes-right {
+  position: absolute; top: 0; bottom: 0; width: 6px;
   background:
-    repeating-linear-gradient(90deg,
+    repeating-linear-gradient(0deg,
       transparent 0,
       transparent calc(5% - 1px),
       rgba(255,255,255,0.7) calc(5% - 1px),
@@ -715,91 +720,84 @@ input, select { font: inherit; color: inherit; }
       transparent calc(5% + 1px),
       transparent 10%);
 }
-.field-play .hashes-top { top: 36%; }
-.field-play .hashes-bot { top: 64%; }
+.field-play .hashes-left { left: 36%; }
+.field-play .hashes-right { left: 64%; }
 
-/* Sidelines (top and bottom of field-of-play) */
+/* Sidelines run vertically along left + right edges of field-of-play */
 .field-play .sideline {
-  position: absolute; left: 0; right: 0; height: 3px;
+  position: absolute; top: 0; bottom: 0; width: 3px;
   background: rgba(255,255,255,0.85);
 }
-.field-play .sideline.top { top: 0; }
-.field-play .sideline.bottom { bottom: 0; }
+.field-play .sideline.left { left: 0; }
+.field-play .sideline.right { right: 0; }
 
-/* Midfield 50 yard line accent (thicker) */
+/* Midfield 50 yard line accent (horizontal band across middle) */
 .field-play .midfield {
-  position: absolute; top: 0; bottom: 0;
-  left: 50%; width: 3px;
+  position: absolute; left: 0; right: 0;
+  top: 50%; height: 3px;
   background: rgba(255,255,255,0.95);
-  transform: translateX(-50%);
+  transform: translateY(-50%);
   box-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 
-/* Yard numbers - rendered via flex container */
-.field-numbers {
-  position: absolute; left: 0; right: 0;
-  display: flex; justify-content: space-between;
-  padding: 0 8%; /* match endzone offset */
-  font-family: var(--font-display);
-  font-size: clamp(10px, 1.6vw, 22px);
-  color: rgba(255,255,255,0.85);
-  letter-spacing: 0.05em;
-  pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-}
-.field-numbers.top { top: 14%; }
-.field-numbers.bottom { bottom: 14%; transform: scaleX(1) rotate(180deg); }
-.field-numbers span {
-  width: 0; text-align: center; transform: translateX(-50%);
-  position: relative;
-}
-.field-numbers span:first-child { transform: translateX(0); }
-.field-numbers span:last-child { transform: translateX(-100%); }
-
-/* Yard numbers placed by absolute positioning instead — cleaner approach */
+/* Yard numbers — two columns (left side rotated to face left sideline,
+   right side rotated to face right sideline, real-NFL style) */
 .yard-num {
   position: absolute;
   font-family: var(--font-display);
-  font-size: clamp(9px, 1.5vw, 20px);
+  font-size: clamp(10px, 1.6vw, 18px);
   color: rgba(255,255,255,0.78);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   pointer-events: none;
-  transform: translateX(-50%);
   user-select: none;
+  white-space: nowrap;
 }
-.yard-num.top { top: 12%; }
-.yard-num.bottom { bottom: 12%; transform: translateX(-50%) rotate(180deg); }
+/* Left column — numbers face the left sideline (rotated 90deg counter-clockwise) */
+.yard-num.left {
+  left: 12%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+/* Right column — numbers face the right sideline (rotated 90deg clockwise) */
+.yard-num.right {
+  left: 88%;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
 
-/* Endzones — Eagles colored with team name */
+/* Endzones — horizontal bars top + bottom. "EAGLES" reads normally. */
 .endzone {
-  position: absolute; top: 0; bottom: 0; width: 8%;
+  position: absolute; left: 0; right: 0; height: 8%;
   background:
-    linear-gradient(180deg,
+    linear-gradient(90deg,
       rgba(255,255,255,0.06) 0,
       transparent 6%, transparent 94%,
       rgba(255,255,255,0.06) 100%),
     linear-gradient(135deg, #003b42 0%, #004C54 50%, #002C32 100%);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(11px, 1.6vw, 22px);
-  letter-spacing: 0.32em;
-  color: rgba(255,255,255,0.92);
-  writing-mode: vertical-rl;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  border-left: 3px solid rgba(255,255,255,0.85);
-  border-right: 3px solid rgba(255,255,255,0.85);
+  font-size: clamp(16px, 3.2vw, 32px);
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
   z-index: 1;
+  padding-left: 0.4em; /* compensate for trailing letter-spacing */
 }
-.endzone.left { left: 0; transform: scaleY(-1); border-left: none; }
-.endzone.right { right: 0; border-right: none; }
+/* Both endzones — text reads normally ("EAGLES" left-to-right) */
+.endzone.top {
+  top: 0;
+  border-bottom: 3px solid rgba(255,255,255,0.85);
+}
+.endzone.bottom {
+  bottom: 0;
+  border-top: 3px solid rgba(255,255,255,0.85);
+}
 
 /* Midfield Eagles logo */
 .field-logo {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  width: clamp(90px, 16vw, 220px);
+  width: clamp(80px, 22vw, 180px);
   height: auto;
   opacity: 0.7;
   pointer-events: none;
@@ -878,10 +876,13 @@ input, select { font: inherit; color: inherit; }
   font-size: clamp(9px, 0.85vw, 11px);
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8);
   white-space: nowrap;
   letter-spacing: 0.04em;
-  max-width: 110px; overflow: hidden; text-overflow: ellipsis;
+  max-width: 80px; overflow: hidden; text-overflow: ellipsis;
+  background: rgba(0,0,0,0.45);
+  padding: 1px 5px;
+  border-radius: 3px;
 }
 .fp-pos {
   font-family: var(--font-mono); font-size: 9px; font-weight: 700;
@@ -947,6 +948,28 @@ input, select { font: inherit; color: inherit; }
 @media (max-width: 600px) {
   .modal-hero { flex-direction: column; text-align: center; }
   .mh-headshot { width: 100px; height: 100px; }
+
+  /* Tighter field on mobile — less tall so chips don't get squished */
+  .field { aspect-ratio: 4 / 5; max-width: 100%; }
+  .field-stage { padding: var(--space-2); }
+
+  /* Smaller player chips so 11 fit comfortably */
+  .fp-avatar { width: 30px; height: 30px; border-width: 1.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 0 2px rgba(0,76,84,0.6); }
+  .fp-avatar .initials { font-size: 10px; }
+  .fp-jersey { font-size: 7px; padding: 1px 3px; min-width: 14px; bottom: -3px; right: -3px; border-width: 1.5px; }
+  .fp-label { font-size: 8px; max-width: 50px; letter-spacing: 0.01em; padding: 1px 3px; }
+  .fp-pos { font-size: 7px; letter-spacing: 0.04em; }
+  .fp { gap: 2px; }
+
+  /* Hide yard numbers on tiny screens to free up space */
+  .yard-num { display: none; }
+  .yard-num.left[style*="top:50"], .yard-num.right[style*="top:50"] { display: block; }
+
+  /* Smaller endzone text */
+  .endzone { font-size: clamp(13px, 5vw, 22px); letter-spacing: 0.3em; }
+
+  /* Shrink midfield logo so it doesn't crowd players */
+  .field-logo { width: clamp(60px, 28vw, 110px); opacity: 0.55; }
 }
 
 /* OVR counter animation */
