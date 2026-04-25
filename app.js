@@ -179,17 +179,20 @@
         // Holder + kicker behind the line, snapper at LOS
         { pos: 'K',  label: 'K',     top: 92, left: 50 },
         { pos: 'P',  label: 'P/H',   top: 84, left: 50 },
-        { pos: 'LS', label: 'LS',    top: 72, left: 50 },
+        // LS sits behind the OL (top:66) with label ABOVE so the long 'Calcaterra' name
+        // clears the LG/RG above-labels and the LT/RT below-labels at every viewport.
+        { pos: 'LS', label: 'LS',    top: 66, left: 50, nameAbove: true },
         // Protection wall (interior 4 + tackles), straight line, alternating labels
         { pos: 'LT', label: 'LT',    top: 72, left: 35 },
         { pos: 'LG', label: 'LG',    top: 72, left: 42.5, nameAbove: true },
         { pos: 'RG', label: 'RG',    top: 72, left: 57.5, nameAbove: true },
         { pos: 'RT', label: 'RT',    top: 72, left: 65 },
-        // Wings flexed outside, label above to keep them off the OL row
-        { pos: 'TE', label: 'WING-L',top: 72, left: 24, index: 0, nameAbove: true },
-        { pos: 'TE', label: 'WING-R',top: 72, left: 76, index: 1, nameAbove: true },
-        // Gunner out wide on the line
-        { pos: 'WR', label: 'GUNNER',top: 72, left: 10, index: 2 },
+        // Wings pushed further out toward the sidelines AND further down so long TE names
+        // (G. Calcaterra) never collide with the RT/LT row at top:72.
+        { pos: 'TE', label: 'WING-L',top: 84, left: 15, index: 0 },
+        { pos: 'TE', label: 'WING-R',top: 84, left: 85, index: 1 },
+        // Gunner out wide on the line, all the way at the numbers
+        { pos: 'WR', label: 'GUNNER',top: 72, left: 6, index: 2 },
       ],
     },
   };
@@ -231,23 +234,26 @@
     document.getElementById('formationName').textContent = formation.label;
 
     const used = new Set();
+    // Identity used for dedupe — collapses dual-role roster entries (e.g. Calcaterra TE
+    // also listed as 'Grant Calcaterra (LS)') so a player only appears once on the field.
+    const identityOf = (p) => `${p.jersey_number}|${p.name.replace(/\s*\(.*?\)\s*/g,'').trim()}`;
     const playerHTML = formation.slots
       .filter((slot) => !slot._skip)
       .map((slot) => {
         // Find player for slot — pick by index of starters at that position
         let player = null;
         const idx = slot.index || 0;
-        const candidates = ROSTER.filter((p) => p.position === slot.pos && p.depth === 'Starter' && !used.has(p.name));
+        const candidates = ROSTER.filter((p) => p.position === slot.pos && p.depth === 'Starter' && !used.has(identityOf(p)));
         if (candidates[idx]) player = candidates[idx];
         else if (candidates[0]) player = candidates[0];
         else {
           // Fallback to any depth
-          const fallback = ROSTER.filter((p) => p.position === slot.pos && !used.has(p.name))
+          const fallback = ROSTER.filter((p) => p.position === slot.pos && !used.has(identityOf(p)))
             .sort((a, b) => ((getMadden(b.name) || {}).overall || 0) - ((getMadden(a.name) || {}).overall || 0));
           player = fallback[idx] || fallback[0] || null;
         }
         if (!player) return ''; // no player available
-        used.add(player.name);
+        used.add(identityOf(player));
 
         const m = getMadden(player.name);
         const ovr = m ? m.overall : null;
@@ -260,10 +266,16 @@
         const parts = player.name.replace(/\(.*?\)/g, '').trim().split(/\s+/);
         const lastName = parts[parts.length - 1].replace(/[().]/g, '');
         const firstInitial = parts[0] ? parts[0][0] : '';
-        const sameLast = ROSTER.filter((p) => {
+        // Disambiguate by last name, but dedupe dual-role roster entries first so
+        // 'Grant Calcaterra' and 'Grant Calcaterra (LS)' don't trigger the 'G.' prefix.
+        const sameLastSet = new Set();
+        ROSTER.forEach((p) => {
           const lp = p.name.replace(/\(.*?\)/g, '').trim().split(/\s+/);
-          return lp[lp.length - 1].replace(/[().]/g, '') === lastName;
+          if (lp[lp.length - 1].replace(/[().]/g, '') === lastName) {
+            sameLastSet.add(identityOf(p));
+          }
         });
+        const sameLast = Array.from(sameLastSet);
         const displayName = sameLast.length > 1 ? `${firstInitial}. ${lastName}` : lastName;
         // If nameAbove is set, render the name label ABOVE the avatar instead of below.
         // Used to stagger O-line labels so they don't overlap, and to keep D-line names
