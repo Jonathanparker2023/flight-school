@@ -126,20 +126,22 @@
     offense: {
       label: '11 Personnel · Trips Right',
       slots: [
-        // O-Line — 5 across at the LOS. Alternate name labels above/below so they don't collide.
-        { pos: 'LT', label: 'LT',    top: 66, left: 36 },
-        { pos: 'LG', label: 'LG',    top: 66, left: 43, nameAbove: true },
+        // O-Line — 5 across at the LOS, perfectly straight (all on top:66).
+        // Labels alternate above/below so names don't collide horizontally.
+        // Wider spacing (~7.5% per slot) gives each name room.
+        { pos: 'LT', label: 'LT',    top: 66, left: 35 },
+        { pos: 'LG', label: 'LG',    top: 66, left: 42.5, nameAbove: true },
         { pos: 'C',  label: 'C',     top: 66, left: 50 },
-        { pos: 'RG', label: 'RG',    top: 66, left: 57, nameAbove: true },
-        { pos: 'RT', label: 'RT',    top: 66, left: 64 },
+        { pos: 'RG', label: 'RG',    top: 66, left: 57.5, nameAbove: true },
+        { pos: 'RT', label: 'RT',    top: 66, left: 65 },
         // X (split end) — way out wide LEFT at the numbers, on the LOS
-        { pos: 'WR', label: 'X',     top: 66, left: 10, index: 0 },
-        // Y — TE flexed just outside RT, on the LOS
-        { pos: 'TE', label: 'Y',     top: 66, left: 73 },
+        { pos: 'WR', label: 'X',     top: 66, left: 8, index: 0 },
+        // Y — TE flexed outside RT with extra gap so 'Goedert' doesn't crash into 'L. Johnson'
+        { pos: 'TE', label: 'Y',     top: 66, left: 76, nameAbove: true },
         // Z — slot receiver outside Y, off the line
-        { pos: 'WR', label: 'Z',     top: 72, left: 82, index: 1 },
+        { pos: 'WR', label: 'Z',     top: 72, left: 84, index: 1 },
         // Trips wide — split out RIGHT at the numbers
-        { pos: 'WR', label: 'SLOT',  top: 66, left: 92, index: 2 },
+        { pos: 'WR', label: 'SLOT',  top: 66, left: 93, index: 2 },
         // QB in shotgun — deep behind center
         { pos: 'QB', label: 'Q',     top: 80, left: 53 },
         // RB / Tailback offset to the QB's left, slightly deeper
@@ -149,12 +151,13 @@
     defense: {
       label: 'Vic Fangio · 4-2-5 Nickel',
       slots: [
-        // Defensive line (4 across, deep at LOS — names render ABOVE chip so they
-        // don't cover the player's face).
+        // Defensive line (4 across, deep at LOS). Alternate label above/below so names
+        // never collide on tight viewports. Even slots (LE, NT) keep label above so
+        // the face stays visible; odd slots (DT, RE) drop the label below.
         { pos: 'DE', label: 'LE',    top: 50, left: 32, index: 0, nameAbove: true },
-        { pos: 'DT', label: 'DT',    top: 50, left: 44, index: 0, nameAbove: true },
+        { pos: 'DT', label: 'DT',    top: 50, left: 44, index: 0 },
         { pos: 'DT', label: 'NT',    top: 50, left: 56, index: 1, nameAbove: true },
-        { pos: 'DE', label: 'RE',    top: 50, left: 68, index: 1, nameAbove: true },
+        { pos: 'DE', label: 'RE',    top: 50, left: 68, index: 1 },
         // Linebackers (off-ball, sit between DL and safeties — plenty of room)
         { pos: 'LB', label: 'MLB',   top: 30, left: 42, index: 0 },
         { pos: 'LB', label: 'WLB',   top: 30, left: 58, index: 1 },
@@ -177,15 +180,16 @@
         { pos: 'K',  label: 'K',     top: 92, left: 50 },
         { pos: 'P',  label: 'P/H',   top: 84, left: 50 },
         { pos: 'LS', label: 'LS',    top: 72, left: 50 },
-        // Protection (5-man interior + wings)
-        { pos: 'LT', label: 'LT',    top: 72, left: 38 },
-        { pos: 'LG', label: 'LG',    top: 72, left: 44 },
-        { pos: 'RG', label: 'RG',    top: 72, left: 56 },
-        { pos: 'RT', label: 'RT',    top: 72, left: 62 },
-        { pos: 'TE', label: 'WING-L',top: 72, left: 28, index: 0 },
-        { pos: 'TE', label: 'WING-R',top: 72, left: 72, index: 1 },
+        // Protection wall (interior 4 + tackles), straight line, alternating labels
+        { pos: 'LT', label: 'LT',    top: 72, left: 35 },
+        { pos: 'LG', label: 'LG',    top: 72, left: 42.5, nameAbove: true },
+        { pos: 'RG', label: 'RG',    top: 72, left: 57.5, nameAbove: true },
+        { pos: 'RT', label: 'RT',    top: 72, left: 65 },
+        // Wings flexed outside, label above to keep them off the OL row
+        { pos: 'TE', label: 'WING-L',top: 72, left: 24, index: 0, nameAbove: true },
+        { pos: 'TE', label: 'WING-R',top: 72, left: 76, index: 1, nameAbove: true },
         // Gunner out wide on the line
-        { pos: 'WR', label: 'GUNNER',top: 72, left: 12, index: 2 },
+        { pos: 'WR', label: 'GUNNER',top: 72, left: 10, index: 2 },
       ],
     },
   };

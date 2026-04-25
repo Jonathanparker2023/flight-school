@@ -824,9 +824,14 @@ input, select { font: inherit; color: inherit; }
   z-index: 2;
   animation: fpDrop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
-/* Label above avatar (used to stagger O-line labels and keep D-line names off faces) */
-.fp.fp-name-above { gap: 3px; }
+/* Label above avatar (used to stagger O-line labels and keep D-line names off faces).
+   Lift the entire chip so its label can't be covered by a neighbor's avatar. */
+.fp.fp-name-above { gap: 3px; z-index: 4; }
 .fp.fp-name-above .fp-label { margin-bottom: 1px; }
+/* Extra-tight label cap for very narrow phones (iPhone SE — 320px) */
+@media (max-width: 360px) {
+  .fp-label { font-size: 7px !important; max-width: 32px !important; padding: 1px 2px !important; letter-spacing: -0.02em; }
+}
 .fp:nth-child(2) { animation-delay: 30ms; }
 .fp:nth-child(3) { animation-delay: 60ms; }
 .fp:nth-child(4) { animation-delay: 90ms; }
@@ -882,10 +887,19 @@ input, select { font: inherit; color: inherit; }
   text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8);
   white-space: nowrap;
   letter-spacing: 0.04em;
-  max-width: 80px; overflow: hidden; text-overflow: ellipsis;
-  background: rgba(0,0,0,0.45);
+  max-width: 96px; overflow: hidden; text-overflow: ellipsis;
+  background: rgba(0,0,0,0.55);
   padding: 1px 5px;
   border-radius: 3px;
+  position: relative;
+  z-index: 3;
+}
+/* On hover/tap, lift the label and let it overflow so truncated names can be read */
+.fp:hover .fp-label, .fp:focus-within .fp-label {
+  z-index: 10;
+  max-width: none;
+  overflow: visible;
+  background: rgba(0,0,0,0.85);
 }
 .fp-pos {
   font-family: var(--font-mono); font-size: 9px; font-weight: 700;
@@ -960,7 +974,9 @@ input, select { font: inherit; color: inherit; }
   .fp-avatar { width: 30px; height: 30px; border-width: 1.5px; box-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 0 2px rgba(0,76,84,0.6); }
   .fp-avatar .initials { font-size: 10px; }
   .fp-jersey { font-size: 7px; padding: 1px 3px; min-width: 14px; bottom: -3px; right: -3px; border-width: 1.5px; }
-  .fp-label { font-size: 8px; max-width: 50px; letter-spacing: 0.01em; padding: 1px 3px; }
+  .fp-label { font-size: 8px; max-width: 40px; letter-spacing: 0; padding: 1px 3px; line-height: 1.1; }
+  /* Tighter labels for the OL row (chips packed across center) */
+  .fp.fp-name-above .fp-label { max-width: 40px; }
   .fp-pos { font-size: 7px; letter-spacing: 0.04em; }
   .fp { gap: 2px; }
 
